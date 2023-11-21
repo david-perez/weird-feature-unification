@@ -1,0 +1,22 @@
+[package]
+name = "weird-feature-unification"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# These three lines make it so that `aws-smithy-http-server` transitively
+# depends on `aws-sdk-dynamodb` 0.35.0, which transitively depends on
+# `aws-sigv4` without the `sigv4a` feature.
+aws-smithy-http-server = { version = "=0.57.1", features = ['aws-lambda'] }
+serde_dynamo = { version = "=4.2.9", features = ["aws-sdk-dynamodb+0_35"] }
+aws_lambda_events = { version = "=0.12.0" }
+
+# This works.
+# aws-sigv4 = { version = "=0.57.1" }
+
+# This doesn't work, because this now makes it so that `aws-smithy-http-server`
+# transitively depends on `aws-sigv4` with the `sigv4a` feature enabled, thus
+# transitively depending on `base16ct`.
+aws-sigv4 = { version = "=0.57.1", features = ["sigv4a"] }
